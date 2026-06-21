@@ -22,4 +22,6 @@ func SetupRoutes(r *gin.Engine) {
 	r.GET("/reports/villages", handlers.GetAllVillageReports)
 
 	r.GET("/dashboard", handlers.GetDashboard)
+
+	r.GET("/receipts/:receipt_number", handlers.GenerateReceipt)
 }
