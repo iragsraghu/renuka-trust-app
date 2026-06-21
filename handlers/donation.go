@@ -50,6 +50,11 @@ func CreateDonation(c *gin.Context) {
 		return
 	}
 
+	config.DB.
+		Preload("Donor").
+		Preload("Donor.Village").
+		First(&donation, donation.ID)
+
 	c.JSON(http.StatusCreated, gin.H{
 		"message":  "Donation created successfully",
 		"donation": donation,
@@ -77,4 +82,41 @@ func GetDonations(c *gin.Context) {
 
 	c.JSON(http.StatusOK, donations)
 
+}
+
+func SearchDonations(c *gin.Context) {
+
+	var donations []models.Donation
+
+	name := c.Query("name")
+	mobile := c.Query("mobile")
+
+	query := config.DB.
+		Preload("Donor").
+		Preload("Donor.Village")
+
+	if name != "" {
+		query = query.
+			Joins("JOIN donors ON donors.id = donations.donor_id").
+			Where("donors.name LIKE ?", "%"+name+"%")
+	}
+
+	if mobile != "" {
+		query = query.
+			Joins("JOIN donors ON donors.id = donations.donor_id").
+			Where("donors.mobile = ?", mobile)
+	}
+
+	result := query.Find(&donations)
+
+	if result.Error != nil {
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": result.Error.Error(),
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, donations)
 }
