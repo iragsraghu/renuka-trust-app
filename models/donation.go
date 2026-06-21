@@ -6,7 +6,7 @@ type Donation struct {
 	ID uint `gorm:"primaryKey" json:"id"`
 
 	DonorID uint  `json:"donor_id"`
-	Donor   Donor `gorm:"foreignKey:DonorID" json:"donor"`
+	Donor   Donor `gorm:"foreignKey:DonorID" json:"-"`
 
 	Amount float64 `json:"amount"`
 
