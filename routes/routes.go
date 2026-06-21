@@ -20,4 +20,6 @@ func SetupRoutes(r *gin.Engine) {
 
 	r.GET("/reports/village/:id", handlers.GetVillageReport)
 	r.GET("/reports/villages", handlers.GetAllVillageReports)
+
+	r.GET("/dashboard", handlers.GetDashboard)
 }
