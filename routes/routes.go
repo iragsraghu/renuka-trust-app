@@ -15,4 +15,9 @@ func SetupRoutes(r *gin.Engine) {
 
 	r.POST("/donations", handlers.CreateDonation)
 	r.GET("/donations", handlers.GetDonations)
+
+	r.GET("/donations/search", handlers.SearchDonations)
+
+	r.GET("/reports/village/:id", handlers.GetVillageReport)
+	r.GET("/reports/villages", handlers.GetAllVillageReports)
 }
