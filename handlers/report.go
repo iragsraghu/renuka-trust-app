@@ -87,3 +87,27 @@ func GetAllVillageReports(c *gin.Context) {
 
 	c.JSON(http.StatusOK, reports)
 }
+
+func GetDashboard(c *gin.Context) {
+
+	var response models.DashboardResponse
+
+	// Total Villages
+	config.DB.Model(&models.Village{}).
+		Count(&response.TotalVillages)
+
+	// Total Donors
+	config.DB.Model(&models.Donor{}).
+		Count(&response.TotalDonors)
+
+	// Total Donations
+	config.DB.Model(&models.Donation{}).
+		Count(&response.TotalDonations)
+
+	// Total Collection
+	config.DB.Model(&models.Donation{}).
+		Select("COALESCE(SUM(amount),0)").
+		Scan(&response.TotalCollection)
+
+	c.JSON(http.StatusOK, response)
+}
