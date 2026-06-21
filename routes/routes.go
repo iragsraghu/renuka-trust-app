@@ -10,6 +10,9 @@ func SetupRoutes(r *gin.Engine) {
 	r.POST("/villages", handlers.CreateVillage)
 	r.GET("/villages", handlers.GetVillages)
 
+	r.POST("/donors", handlers.CreateDonor)
+	r.GET("/donors", handlers.GetDonors)
+
 	r.POST("/donations", handlers.CreateDonation)
 	r.GET("/donations", handlers.GetDonations)
 }
