@@ -1,12 +1,11 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/iragsraghu/renuka-trust-app/config"
 	"github.com/iragsraghu/renuka-trust-app/models"
+	"github.com/iragsraghu/renuka-trust-app/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -38,11 +37,7 @@ func CreateDonation(c *gin.Context) {
 	}
 
 	// Generate receipt number
-
-	donation.ReceiptNumber = fmt.Sprintf(
-		"RYD%d",
-		time.Now().Unix(),
-	)
+	donation.ReceiptNumber = utils.GenerateReceiptNumber()
 
 	result := config.DB.Create(&donation)
 
