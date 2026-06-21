@@ -7,6 +7,8 @@ import (
 )
 
 func SetupRoutes(r *gin.Engine) {
+	r.POST("/villages", handlers.CreateVillage)
+	r.GET("/villages", handlers.GetVillages)
 
 	r.POST("/donations", handlers.CreateDonation)
 	r.GET("/donations", handlers.GetDonations)
