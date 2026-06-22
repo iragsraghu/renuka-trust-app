@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/iragsraghu/renuka-trust-app/config"
+	"github.com/iragsraghu/renuka-trust-app/helper"
 	"github.com/iragsraghu/renuka-trust-app/models"
 
 	"github.com/gin-gonic/gin"
@@ -35,50 +36,80 @@ func GenerateReceipt(c *gin.Context) {
 	// PDF creation starts here
 
 	pdf := gofpdf.New("P", "mm", "A4", "")
-
 	pdf.AddPage()
 
-	pdf.SetFont("Arial", "B", 16)
+	// Background template
+	pdf.Image(
+		"assets/logo4.png",
+		0,
+		0,
+		210,
+		297,
+		false,
+		"",
+		0,
+		"",
+	)
 
-	pdf.Cell(190, 10, "Shri Renuka Yellamma Devi Trust")
+	pdf.SetTextColor(0, 0, 0)
+	pdf.SetFont("Arial", "B", 12)
 
-	pdf.Ln(12)
+	// Receipt Number
+	pdf.SetXY(60, 87)
+	pdf.Cell(50, 8, donation.ReceiptNumber)
 
-	pdf.SetFont("Arial", "", 12)
+	// Date
+	pdf.SetXY(150, 87)
+	pdf.Cell(30, 8, donation.CreatedAt.Format("02-01-2006"))
 
-	pdf.Cell(190, 10, "Donation Receipt")
+	// Donor Name
+	pdf.SetFont("Arial", "B", 12)
+	pdf.SetXY(82, 115)
+	pdf.Cell(80, 8, donation.Donor.Name)
 
-	pdf.Ln(15)
+	// Mobile
+	pdf.SetXY(82, 127)
+	pdf.Cell(80, 8, donation.Donor.Mobile)
 
-	pdf.Cell(190, 10, "Receipt No: "+donation.ReceiptNumber)
+	// Village
+	pdf.SetXY(82, 139)
+	pdf.Cell(80, 8, donation.Donor.Village.Name)
 
-	pdf.Ln(10)
+	// Address
+	pdf.SetXY(82, 150)
+	pdf.Cell(90, 8, donation.Donor.Address)
 
-	pdf.Cell(190, 10, "Donor Name: "+donation.Donor.Name)
+	// Amount
+	pdf.SetFont("Arial", "B", 15)
+	pdf.SetTextColor(180, 0, 0)
 
-	pdf.Ln(10)
+	pdf.SetXY(82, 177)
+	pdf.Cell(
+		60,
+		8,
+		fmt.Sprintf("Rs. %.2f", donation.Amount),
+	)
 
-	pdf.Cell(190, 10, "Mobile: "+donation.Donor.Mobile)
+	// Payment Mode
+	pdf.SetTextColor(0, 0, 0)
+	pdf.SetFont("Arial", "B", 12)
 
-	pdf.Ln(10)
+	pdf.SetXY(82, 189)
+	pdf.Cell(80, 8, donation.PaymentMode)
 
-	pdf.Cell(190, 10, "Village: "+donation.Donor.Village.Name)
+	// Purpose
+	pdf.SetXY(82, 200)
+	pdf.Cell(80, 8, donation.Purpose)
 
-	pdf.Ln(10)
+	// Amount In Words
+	pdf.SetFont("Times", "BI", 15)
 
-	pdf.Cell(190, 10, "Amount: Rs. "+fmt.Sprintf("%.2f", donation.Amount))
-
-	pdf.Ln(10)
-
-	pdf.Cell(190, 10, "Purpose: "+donation.Purpose)
-
-	pdf.Ln(10)
-
-	pdf.Cell(190, 10, "Payment Mode: "+donation.PaymentMode)
-
-	pdf.Ln(20)
-
-	pdf.Cell(190, 10, "Thank You For Your Donation")
+	pdf.SetXY(40, 224)
+	pdf.Cell(
+		120,
+		8,
+		helper.RupeesInWords(donation.Amount),
+	)
 
 	filename := "receipt_" + donation.ReceiptNumber + ".pdf"
 
