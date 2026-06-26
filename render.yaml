@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: renuka-trust-api
+    runtime: go
+    buildCommand: go build -o app
+    startCommand: ./app
