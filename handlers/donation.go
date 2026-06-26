@@ -68,7 +68,7 @@ func GetDonations(c *gin.Context) {
 	result := config.DB.
 		Preload("Donor").
 		Preload("Donor.Village").
-		Order("created_at DESC").
+		Order("id DESC").
 		Find(&donations)
 
 	if result.Error != nil {
@@ -91,30 +91,39 @@ func SearchDonations(c *gin.Context) {
 	name := c.Query("name")
 	mobile := c.Query("mobile")
 
-	query := config.DB.
-		Preload("Donor").
-		Preload("Donor.Village")
-
-	if name != "" {
-		query = query.
-			Joins("JOIN donors ON donors.id = donations.donor_id").
-			Where("donors.name LIKE ?", "%"+name+"%")
+	// At least one search parameter is required
+	if name == "" && mobile == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Please provide either name or mobile number",
+		})
+		return
 	}
 
-	if mobile != "" {
-		query = query.
-			Joins("JOIN donors ON donors.id = donations.donor_id").
-			Where("donors.mobile = ?", mobile)
+	query := config.DB.
+		Model(&models.Donation{}).
+		Preload("Donor").
+		Preload("Donor.Village").
+		Joins("JOIN donors ON donors.id = donations.donor_id")
+
+	if name != "" {
+		query = query.Where("donors.name LIKE ?", "%"+name+"%")
+	} else {
+		query = query.Where("donors.mobile = ?", mobile)
 	}
 
 	result := query.Find(&donations)
 
 	if result.Error != nil {
-
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": result.Error.Error(),
 		})
+		return
+	}
 
+	if len(donations) == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": "No donations found",
+		})
 		return
 	}
 
