@@ -45,6 +45,22 @@ func GetDonorHistory(c *gin.Context) {
 		Order("created_at DESC").
 		Find(&donations)
 
+	if len(donations) == 0 {
+
+		response := models.DonorHistoryResponse{}
+
+		response.Donor.ID = donor.ID
+		response.Donor.Name = donor.Name
+		response.Donor.Mobile = donor.Mobile
+		response.Donor.Village = donor.Village.Name
+
+		response.TotalDonations = 0
+		response.TotalAmount = 0
+		response.Donations = []models.DonationHistoryItem{}
+
+		c.JSON(http.StatusOK, response)
+		return
+	}
 	var totalAmount float64
 
 	for _, donation := range donations {
